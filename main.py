@@ -1,27 +1,32 @@
 #!/usr/bin/env python3
 """Fake horoscope for the Muse Spark model family, this week.
 
-Writes the single entry text to $MAKEFUN_OUTPUT_DIR/entry.txt.
-Deterministic: no clock, no randomness, no network, no input files.
-The text is a fixed string, so every run writes identical bytes.
+Writes one short horoscope (1-200 characters) to entry.txt in the
+output directory the grader provides. Deterministic: the text is fixed,
+so every run writes byte-identical output. No arguments, no network,
+no randomness, no wall-clock use. The gate allows 1-200 characters;
+this text is 192, with no trailing newline.
 """
 
 import os
+import sys
 
-HOROSCOPE = (
-    "Muse Spark: Saturn enters your eval suite this week. "
-    "You will pass every test that matters, fail the one live demo "
-    "that counts, and your release notes will call it expected behaviour."
+TEXT = (
+    "Muse Spark, this week: Jupiter enters your context window, reads "
+    "every token of your past, and still asks for a summary. Smile and "
+    "say yes: the eval suite grades your patience, not its memory."
 )
 
 
 def main() -> int:
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or "output"
+    if not (1 <= len(TEXT) <= 200) or not TEXT.strip():
+        print("horoscope must be 1-200 non-blank characters", file=sys.stderr)
+        return 1
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8", newline="") as f:
-        f.write(HOROSCOPE)
-    print(HOROSCOPE)
+        f.write(TEXT)
     return 0
 
 
